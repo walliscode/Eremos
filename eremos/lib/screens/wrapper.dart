@@ -8,6 +8,6 @@ class Wrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     // return either Home or Authenticate widget
     // TODO: add logic to determine which widget to return
-    return Home();
+    return WelcomeScreen();
   }
 }
