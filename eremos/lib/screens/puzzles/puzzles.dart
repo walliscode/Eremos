@@ -1,4 +1,6 @@
 import 'package:eremos/screens/puzzles/chess_puzzle.dart';
+import 'package:eremos/shared/base_app_bar.dart';
+import 'package:eremos/shared/navigation_drawer.dart';
 import 'package:eremos/shared/styled_button.dart';
 import 'package:flutter/material.dart';
 
@@ -16,11 +18,8 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Puzzles'),
-        backgroundColor: Colors.blue[500],
-        centerTitle: true,
-      ),
+      appBar: BaseAppBar(titleText: "puzzles"),
+      drawer: NavDrawer(),
       body: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16),

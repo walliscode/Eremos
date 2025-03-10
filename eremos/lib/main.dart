@@ -1,6 +1,5 @@
 import 'package:eremos/models/app_user.dart';
-
-import 'package:eremos/screens/profile/profile.dart';
+import 'package:eremos/screens/home/home.dart';
 import 'package:eremos/screens/providers/auth_provider.dart';
 import 'package:eremos/screens/puzzles/puzzles.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -35,9 +34,9 @@ class MyApp extends StatelessWidget {
           return user.when(
             data: (value) {
               if (value == null) {
-                return const PuzzleScreen();
+                return WelcomeScreen();
               }
-              return ProfileScreen(user: value);
+              return PuzzleScreen();
             },
             error: (error, _) => const Text("error loading auth status...."),
             loading: () => const Text("loading..."),

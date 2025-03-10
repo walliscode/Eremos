@@ -29,7 +29,7 @@ class _SignUpFormState extends State<SignUpForm> {
             ),
             const SizedBox(height: 16.0),
 
-            // username/emal
+            // username/email
             TextFormField(
               controller: _emailController,
               decoration: const InputDecoration(labelText: 'Email'),
