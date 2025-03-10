@@ -74,7 +74,7 @@ Future<void> _dialogBuilder(BuildContext context) {
       return AlertDialog(
         title: const Text('Hint'),
         content: const Text(
-          "The wise see many moves ahead, yet even the greatest must bow when their final hour arrives",
+          "The wise see many moves ahead, yet even the greatest must bow when their final hour arrives. Speak to me the killing blow",
         ),
         actions: <Widget>[
           TextButton(
@@ -101,6 +101,7 @@ class ChessBoard extends StatefulWidget {
 class _ChessBoardState extends State<ChessBoard> {
   // list of chess pieces in ascii characters
   final List<String> _pieces = [
+    '',
     '♔',
     '♕',
     '♖',
