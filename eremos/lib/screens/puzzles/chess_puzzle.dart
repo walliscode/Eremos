@@ -1,3 +1,5 @@
+import 'package:eremos/shared/base_app_bar.dart';
+import 'package:eremos/shared/navigation_drawer.dart';
 import 'package:eremos/shared/styled_button.dart';
 import 'package:flutter/material.dart';
 
@@ -14,11 +16,8 @@ class _ChessPuzzleState extends State<ChessPuzzle> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Puzzle 1'),
-        backgroundColor: Colors.blue[500],
-        centerTitle: true,
-      ),
+      appBar: BaseAppBar(titleText: "Puzzle 1"),
+      drawer: NavDrawer(),
       body: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16),
@@ -44,11 +43,14 @@ class _ChessPuzzleState extends State<ChessPuzzle> {
             ),
             const SizedBox(height: 16.0),
             // text field for answer
-            TextField(
-              controller: _answerController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Enter your answer',
+            SizedBox(
+              width: 200.0,
+              child: TextFormField(
+                controller: _answerController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Enter your answer',
+                ),
               ),
             ),
             const SizedBox(height: 16.0),
