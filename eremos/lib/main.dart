@@ -1,7 +1,8 @@
 import 'package:eremos/models/app_user.dart';
-import 'package:eremos/screens/home/home.dart';
+
 import 'package:eremos/screens/profile/profile.dart';
 import 'package:eremos/screens/providers/auth_provider.dart';
+import 'package:eremos/screens/puzzles/puzzles.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
           return user.when(
             data: (value) {
               if (value == null) {
-                return const WelcomeScreen();
+                return const PuzzleScreen();
               }
               return ProfileScreen(user: value);
             },
