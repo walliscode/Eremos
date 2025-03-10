@@ -1,3 +1,4 @@
+import 'package:eremos/screens/puzzles/chess_puzzle.dart';
 import 'package:eremos/shared/styled_button.dart';
 import 'package:flutter/material.dart';
 
@@ -32,7 +33,10 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
             // puzzle 1
             StyledButton(
               onPressed: () {
-                // navigate to puzzle 1 screen
+                // navigate to chess puzzle screen
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const ChessPuzzle()),
+                );
               },
               child: const StyledButtonText('Puzzle 1'),
             ),
