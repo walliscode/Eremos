@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eremos/services/auth_service.dart';
 import 'package:eremos/shared/styled_button.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,8 @@ class _SignUpFormState extends State<SignUpForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -70,7 +73,21 @@ class _SignUpFormState extends State<SignUpForm> {
 
                 final user = await AuthService.signUp(email, password);
 
-                // TODO: error handling
+                if (user != null) {
+                  // create user object to add to cloud firestore
+                  final dbUser = <String, dynamic>{
+                    'teamId': null,
+                    'displayName': null,
+                  };
+                  await _db
+                      .collection('users')
+                      .doc(user.uid)
+                      .set(dbUser)
+                      .onError(
+                        (error, stackTrace) =>
+                            print('Error adding user: $error'),
+                      );
+                }
               },
               child: const StyledButtonText('Sign Up'),
             ),

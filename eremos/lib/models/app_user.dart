@@ -3,4 +3,5 @@ class AppUser {
   final String uid;
   final String email;
   int? teamId;
+  String? displayName;
 }
