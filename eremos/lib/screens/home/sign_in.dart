@@ -1,4 +1,5 @@
 import 'package:eremos/models/app_user.dart';
+import 'package:eremos/screens/puzzles/puzzles.dart';
 import 'package:eremos/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:eremos/shared/styled_text.dart';
@@ -83,6 +84,7 @@ class _SignInFormState extends State<SignInForm> {
                       _errorFeedback = 'Invalid credentials';
                     });
                   }
+                  print("user found");
                 }
               },
               child: const StyledButtonText('Sign In'),

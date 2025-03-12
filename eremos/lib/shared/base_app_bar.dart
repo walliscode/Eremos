@@ -4,6 +4,7 @@
 //
 //
 
+import 'package:eremos/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
 class BaseAppBar extends AppBar {
@@ -14,5 +15,14 @@ class BaseAppBar extends AppBar {
         title: Text(titleText),
         backgroundColor: Colors.blue[500],
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              // sign out the user
+              await AuthService.signOut();
+            },
+          ),
+        ],
       );
 }
