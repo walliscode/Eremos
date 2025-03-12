@@ -3,6 +3,7 @@
 
 import 'package:eremos/screens/home/home.dart';
 import 'package:eremos/screens/puzzles/puzzles.dart';
+import 'package:eremos/screens/teams/teams.dart';
 import 'package:flutter/material.dart';
 
 // create a destination class to hold the title and navigation route
@@ -18,6 +19,7 @@ class NavDrawer extends StatelessWidget {
   static final List<Destination> allDestinations = <Destination>[
     Destination(title: 'Home', destination: WelcomeScreen()),
     Destination(title: 'Puzzles', destination: PuzzleScreen()),
+    Destination(title: 'Teams', destination: Teams()),
   ];
 
   const NavDrawer({super.key});

@@ -34,8 +34,12 @@ class MyApp extends StatelessWidget {
           return user.when(
             data: (value) {
               if (value == null) {
+                print("No user found");
+                print(user);
                 return WelcomeScreen();
               }
+              print("user found");
+              print(user);
               return PuzzleScreen();
             },
             error: (error, _) => const Text("error loading auth status...."),
