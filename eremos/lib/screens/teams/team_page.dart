@@ -28,7 +28,7 @@ class _TeamsPageState extends State<TeamsPage> {
   }
 
   Future<void> addTeam(String teamName) async {
-    final Team team = Team(id: '', name: teamName, members: []);
+    final Team team = Team(id: '', name: teamName);
     await _db.collection("teams").add(team.toFirestore());
   }
 
@@ -100,6 +100,7 @@ class _TeamsPageState extends State<TeamsPage> {
             },
             child: const StyledButtonText("Add Team"),
           ),
+          const SizedBox(height: 40.0),
         ],
       ),
     );

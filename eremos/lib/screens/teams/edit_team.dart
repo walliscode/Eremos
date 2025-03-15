@@ -1,72 +1,72 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:eremos/models/app_user.dart';
 import 'package:eremos/models/team.dart';
+import 'package:eremos/shared/base_app_bar.dart';
 import 'package:flutter/material.dart';
 
 class EditTeamMembers extends StatefulWidget {
   final Team team;
-  const EditTeamMembers({required this.team});
+  const EditTeamMembers({required this.team, super.key});
+
   @override
-  _EditTeamMembersState createState() => _EditTeamMembersState();
+  EditTeamMembersState createState() => EditTeamMembersState();
 }
 
-// This class is responsible for editing the members of a team
-// It finds all users with no team associated with its ids
-//
-// this needs to consume the Stream to get the user uid. This then looks up the user in the users collection
-// any users without a team id are presented as a list of users to add to the team
-
-class _EditTeamMembersState extends State<EditTeamMembers> {
+class EditTeamMembersState extends State<EditTeamMembers> {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final TextEditingController _emailController = TextEditingController();
-  final List<String> _members = [];
+
+  //
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Edit Team Members')),
+      appBar: BaseAppBar(titleText: "Edit Teams"),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.add),
-                  onPressed: () {
-                    _addMember();
-                  },
-                ),
-              ),
-            ),
-          ),
+          const SizedBox(height: 20, child: Text("Delete Members")),
+
           Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream:
-                  _db
-                      .collection('users')
-                      .where('teamId', isNull: true)
-                      .snapshots(),
+            // using a FutureBuilder, get team users from database
+            child: FutureBuilder<List<CloudbaseUser>>(
+              future: widget.team.getUsers(_db),
               builder: (
                 BuildContext context,
-                AsyncSnapshot<QuerySnapshot> snapshot,
+                AsyncSnapshot<List<CloudbaseUser>> snapshot,
               ) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return Center(child: Text('No users found'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No users found'));
                 } else {
-                  List<QueryDocumentSnapshot> users = snapshot.data!.docs;
+                  List<CloudbaseUser> users = snapshot.data!;
                   return ListView.builder(
                     itemCount: users.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return ListTile(
-                        title: Text(users[index]['email']),
-                        onTap: () {
-                          _addMember(uid: users[index].id);
-                        },
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: SizedBox(
+                          width: 200.0,
+                          child: Card(
+                            child: ListTile(
+                              title: Text(users[index].displayName),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () {
+                                  // delete user from team
+                                  // update the team in the database
+                                  deleteUserFromTeam(
+                                    users[index].uid,
+                                    widget.team.id,
+                                  );
+                                  setState(() {
+                                    users.removeAt(index);
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
                       );
                     },
                   );
@@ -74,16 +74,54 @@ class _EditTeamMembersState extends State<EditTeamMembers> {
               },
             ),
           ),
+
+          // using a Future builder, find all members without a team
+          const SizedBox(height: 20.0, child: Text("Add Members")),
           Expanded(
-            child: ListView.builder(
-              itemCount: widget.team.members.length,
-              itemBuilder: (BuildContext context, int index) {
-                return ListTile(
-                  title: Text(widget.team.members[index]),
-                  onTap: () {
-                    _removeMember(index);
-                  },
-                );
+            child: FutureBuilder<List<CloudbaseUser>>(
+              future: getUnassignedUsers(),
+              builder: (
+                BuildContext context,
+                AsyncSnapshot<List<CloudbaseUser>> snapshot,
+              ) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No users found'));
+                } else {
+                  List<CloudbaseUser> users = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: users.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: SizedBox(
+                          width: 200.0,
+                          child: Card(
+                            child: ListTile(
+                              title: Text(users[index].displayName),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.add),
+                                // update teamId for User on press
+                                onPressed: () async {
+                                  await updateUserTeamId(
+                                    users[index].uid,
+                                    widget.team.id,
+                                  );
+                                  setState(() {
+                                    users.removeAt(index);
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }
               },
             ),
           ),
@@ -92,21 +130,32 @@ class _EditTeamMembersState extends State<EditTeamMembers> {
     );
   }
 
-  void _addMember({String? uid}) {
-    String email = _emailController.text;
-    if (uid != null) {
-      _members.add(uid);
-    } else {
-      _members.add(email);
+  // method to provide all users without a team
+
+  Future<List<CloudbaseUser>> getUnassignedUsers() async {
+    List<CloudbaseUser> users = [];
+    QuerySnapshot querySnapshot =
+        await _db.collection('users').where('teamId', isNull: true).get();
+    for (DocumentSnapshot doc in querySnapshot.docs) {
+      final userData = doc.data() as Map<String, dynamic>;
+      users.add(
+        CloudbaseUser(
+          uid: doc.id,
+          displayName: userData['displayName'],
+          teamId: userData['teamId'],
+        ),
+      );
     }
-    setState(() {
-      _emailController.clear();
-    });
+    return users;
   }
 
-  void _removeMember(int index) {
-    setState(() {
-      _members.removeAt(index);
-    });
+  // method to update the teamId for a user
+  Future<void> updateUserTeamId(String userId, String teamId) async {
+    await _db.collection('users').doc(userId).update({"teamId": teamId});
+  }
+
+  // method to delete a user from a team
+  Future<void> deleteUserFromTeam(String userId, String teamId) async {
+    await _db.collection('users').doc(userId).update({"teamId": null});
   }
 }
