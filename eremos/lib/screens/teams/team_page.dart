@@ -24,11 +24,16 @@ class _TeamsPageState extends State<TeamsPage> {
 
   Future<List<Team>> getTeams() async {
     QuerySnapshot querySnapshot = await _db.collection("teams").get();
-    return querySnapshot.docs.map((doc) => Team.fromFirestore(doc)).toList();
+    return querySnapshot.docs
+        .map(
+          (doc) =>
+              Team.fromFirestore(doc.data() as Map<String, dynamic>, doc.id),
+        )
+        .toList();
   }
 
   Future<void> addTeam(String teamName) async {
-    final Team team = Team(id: '', name: teamName);
+    final Team team = Team(name: teamName);
     await _db.collection("teams").add(team.toFirestore());
   }
 
