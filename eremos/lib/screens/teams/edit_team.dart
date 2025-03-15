@@ -57,7 +57,7 @@ class EditTeamMembersState extends State<EditTeamMembers> {
                                   // update the team in the database
                                   deleteUserFromTeam(
                                     users[index].uid,
-                                    widget.team.id,
+                                    widget.team.id!,
                                   );
                                   setState(() {
                                     users.removeAt(index);
@@ -108,7 +108,7 @@ class EditTeamMembersState extends State<EditTeamMembers> {
                                 onPressed: () async {
                                   await updateUserTeamId(
                                     users[index].uid,
-                                    widget.team.id,
+                                    widget.team.id!,
                                   );
                                   setState(() {
                                     users.removeAt(index);

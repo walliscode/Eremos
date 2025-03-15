@@ -1,21 +1,43 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eremos/models/app_user.dart';
+import 'package:eremos/models/puzzle_state.dart';
 
 class Team {
-  final String id;
+  String? id;
   final String name;
+  final List<PuzzleState> puzzles;
 
-  Team({required this.id, required this.name});
+  Team({required this.name})
+    : puzzles = [
+        PuzzleState(
+          puzzleName: "chessPuzzle",
+          puzzleHints: [
+            Hint(level: "easy"),
+            Hint(level: "medium"),
+            Hint(level: "hard"),
+          ],
+        ),
+      ];
 
-  // Factory constructor to create a Team from a Firestore document
-  factory Team.fromFirestore(DocumentSnapshot doc) {
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    return Team(id: doc.id, name: data['name'] ?? '');
-  }
+  Team.fromFirestore(Map<String, dynamic> data, this.id)
+    : name = data['name'],
+      puzzles = [for (var p in data['puzzles']) PuzzleState.fromFirestore(p)];
 
   // Method to convert a Team to a Firestore document
   Map<String, dynamic> toFirestore() {
-    return {'name': name};
+    return {
+      'name': name,
+      'puzzles': [
+        {
+          "puzzleName": "chessPuzzle",
+          "puzzleHints": [
+            {"level": "easy", "used": false},
+            {"level": "medium", "used": false},
+            {"level": "hard", "used": false},
+          ],
+        },
+      ],
+    };
   }
 
   // Get all users in this Team
