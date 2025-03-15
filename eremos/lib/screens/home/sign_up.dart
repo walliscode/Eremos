@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eremos/services/auth_service.dart';
 import 'package:eremos/shared/styled_button.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,10 @@ class SignUpForm extends StatefulWidget {
 class _SignUpFormState extends State<SignUpForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _displayNameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -43,6 +47,17 @@ class _SignUpFormState extends State<SignUpForm> {
             // give some space with size box
             const SizedBox(height: 16.0),
 
+            // display name
+            TextFormField(
+              controller: _displayNameController,
+              decoration: const InputDecoration(labelText: 'Display Name'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a display name';
+                }
+                return null;
+              },
+            ),
             // password
             TextFormField(
               controller: _passwordController,
@@ -67,10 +82,25 @@ class _SignUpFormState extends State<SignUpForm> {
 
                 final String email = _emailController.text.trim();
                 final String password = _passwordController.text.trim();
+                final String displayName = _displayNameController.text.trim();
 
                 final user = await AuthService.signUp(email, password);
 
-                // TODO: error handling
+                if (user != null) {
+                  // create user object to add to cloud firestore
+                  final dbUser = <String, dynamic>{
+                    'teamId': null,
+                    'displayName': displayName,
+                  };
+                  await _db
+                      .collection('users')
+                      .doc(user.uid)
+                      .set(dbUser)
+                      .onError(
+                        (error, stackTrace) =>
+                            print('Error adding user: $error'),
+                      );
+                }
               },
               child: const StyledButtonText('Sign Up'),
             ),

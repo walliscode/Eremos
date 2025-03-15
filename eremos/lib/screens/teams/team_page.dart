@@ -2,31 +2,34 @@
 // create and delete teams
 // open a team to add or remove members
 
+import 'package:eremos/models/team.dart';
+import 'package:eremos/screens/teams/edit_team.dart';
+
 import 'package:eremos/shared/base_app_bar.dart';
 import 'package:eremos/shared/navigation_drawer.dart';
 import 'package:eremos/shared/styled_button.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Teams extends StatefulWidget {
+class TeamsPage extends StatefulWidget {
+  const TeamsPage({super.key});
+
   @override
-  _TeamsState createState() => _TeamsState();
+  _TeamsPageState createState() => _TeamsPageState();
 }
 
-class _TeamsState extends State<Teams> {
+class _TeamsPageState extends State<TeamsPage> {
   final TextEditingController _teamNameController = TextEditingController();
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  Future<List<Map<String, dynamic>>> getTeams() async {
+  Future<List<Team>> getTeams() async {
     QuerySnapshot querySnapshot = await _db.collection("teams").get();
-    return querySnapshot.docs
-        .map((doc) => doc.data() as Map<String, dynamic>)
-        .toList();
+    return querySnapshot.docs.map((doc) => Team.fromFirestore(doc)).toList();
   }
 
   Future<void> addTeam(String teamName) async {
-    final Map<String, dynamic> team = {'name': teamName, 'members': []};
-    await _db.collection("teams").add(team);
+    final Team team = Team(id: '', name: teamName);
+    await _db.collection("teams").add(team.toFirestore());
   }
 
   @override
@@ -37,11 +40,11 @@ class _TeamsState extends State<Teams> {
       body: Column(
         children: [
           Expanded(
-            child: FutureBuilder<List<Map<String, dynamic>>>(
+            child: FutureBuilder<List<Team>>(
               future: getTeams(),
               builder: (
                 BuildContext context,
-                AsyncSnapshot<List<Map<String, dynamic>>> snapshot,
+                AsyncSnapshot<List<Team>> snapshot,
               ) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
@@ -50,17 +53,26 @@ class _TeamsState extends State<Teams> {
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return Center(child: Text('No teams found'));
                 } else {
-                  List<Map<String, dynamic>> teams = snapshot.data!;
+                  List<Team> teams = snapshot.data!;
                   return ListView.builder(
                     itemCount: teams.length,
                     itemBuilder: (BuildContext context, int index) {
                       return Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: SizedBox(
                           width: 200.0,
                           child: StyledButton(
-                            onPressed: () {},
-                            child: StyledButtonText(teams[index]["name"]),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) =>
+                                          EditTeamMembers(team: teams[index]),
+                                ),
+                              );
+                            },
+                            child: Text(teams[index].name),
                           ),
                         ),
                       );
@@ -88,7 +100,7 @@ class _TeamsState extends State<Teams> {
             },
             child: const StyledButtonText("Add Team"),
           ),
-          const SizedBox(height: 16.0),
+          const SizedBox(height: 40.0),
         ],
       ),
     );
