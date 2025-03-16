@@ -7,9 +7,13 @@ class User {
 }
 
 class AppUser extends User {
-  AppUser({required super.uid, required this.email});
-
   final String email;
+  // is Ben logged in will check the email of the user and if it is ben then it will return true
+  final bool isBenLoggedIn;
+  final bool isZacLoggedIn;
+  AppUser({required super.uid, required this.email})
+    : isBenLoggedIn = email == 'ben@test.com',
+      isZacLoggedIn = email == 'zac@test.com';
 }
 
 class CloudbaseUser extends User {
