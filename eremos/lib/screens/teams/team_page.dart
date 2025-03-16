@@ -2,7 +2,10 @@
 // create and delete teams
 // open a team to add or remove members
 
+import 'package:eremos/models/app_user.dart';
 import 'package:eremos/models/team.dart';
+import 'package:eremos/screens/home/home.dart';
+import 'package:eremos/screens/providers/auth_provider.dart';
 import 'package:eremos/screens/teams/edit_team.dart';
 
 import 'package:eremos/shared/base_app_bar.dart';
@@ -10,6 +13,7 @@ import 'package:eremos/shared/navigation_drawer.dart';
 import 'package:eremos/shared/styled_button.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class TeamsPage extends StatefulWidget {
   const TeamsPage({super.key});
@@ -39,75 +43,98 @@ class _TeamsPageState extends State<TeamsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: BaseAppBar(titleText: "Teams"),
-      drawer: NavDrawer(),
-      body: Column(
-        children: [
-          Expanded(
-            child: FutureBuilder<List<Team>>(
-              future: getTeams(),
-              builder: (
-                BuildContext context,
-                AsyncSnapshot<List<Team>> snapshot,
-              ) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No teams found'));
-                } else {
-                  List<Team> teams = snapshot.data!;
-                  return ListView.builder(
-                    itemCount: teams.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: SizedBox(
-                          width: 200.0,
-                          child: StyledButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) =>
-                                          EditTeamMembers(team: teams[index]),
+    return Consumer(
+      builder: (context, ref, child) {
+        final AsyncValue<AppUser?> user = ref.watch(authProvider);
+
+        return user.when(
+          data: (value) {
+            // return user to home screen if not logged in
+            if (value == null) {
+              return WelcomeScreen();
+            }
+            return Scaffold(
+              appBar: BaseAppBar(titleText: "Teams"),
+              drawer: NavDrawer(isBenLoggedIn: value.isBenLoggedIn),
+              body: Column(
+                children: [
+                  Expanded(
+                    child: FutureBuilder<List<Team>>(
+                      future: getTeams(),
+                      builder: (
+                        BuildContext context,
+                        AsyncSnapshot<List<Team>> snapshot,
+                      ) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          return Center(
+                            child: Text('Error: ${snapshot.error}'),
+                          );
+                        } else if (!snapshot.hasData ||
+                            snapshot.data!.isEmpty) {
+                          return Center(child: Text('No teams found'));
+                        } else {
+                          List<Team> teams = snapshot.data!;
+                          return ListView.builder(
+                            itemCount: teams.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0,
+                                ),
+                                child: SizedBox(
+                                  width: 200.0,
+                                  child: StyledButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => EditTeamMembers(
+                                                team: teams[index],
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(teams[index].name),
+                                  ),
                                 ),
                               );
                             },
-                            child: Text(teams[index].name),
-                          ),
-                        ),
-                      );
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  SizedBox(
+                    width: 200.0,
+                    child: TextFormField(
+                      controller: _teamNameController,
+                      decoration: const InputDecoration(labelText: 'Team Name'),
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  StyledButton(
+                    onPressed: () async {
+                      await addTeam(_teamNameController.text.trim());
+                      setState(() {
+                        _teamNameController.clear();
+                      });
                     },
-                  );
-                }
-              },
-            ),
-          ),
-          const SizedBox(height: 16.0),
-          SizedBox(
-            width: 200.0,
-            child: TextFormField(
-              controller: _teamNameController,
-              decoration: const InputDecoration(labelText: 'Team Name'),
-            ),
-          ),
-          const SizedBox(height: 16.0),
-          StyledButton(
-            onPressed: () async {
-              await addTeam(_teamNameController.text.trim());
-              setState(() {
-                _teamNameController.clear();
-              });
-            },
-            child: const StyledButtonText("Add Team"),
-          ),
-          const SizedBox(height: 40.0),
-        ],
-      ),
+                    child: const StyledButtonText("Add Team"),
+                  ),
+                  const SizedBox(height: 40.0),
+                ],
+              ),
+            );
+          },
+          error: (error, _) => const Text("error loading auth status...."),
+          loading: () => const Text("loading..."),
+        );
+      },
     );
   }
 }

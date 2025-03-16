@@ -16,15 +16,16 @@ class Destination {
 }
 
 class NavDrawer extends StatelessWidget {
-  static final List<Destination> allDestinations = <Destination>[
-    Destination(title: 'Home', destination: WelcomeScreen()),
-    Destination(title: 'Puzzles', destination: PuzzleScreen()),
-    Destination(title: 'Teams', destination: TeamsPage()),
-  ];
+  final bool isBenLoggedIn;
 
-  const NavDrawer({super.key});
+  const NavDrawer({super.key, required this.isBenLoggedIn});
   @override
   Widget build(BuildContext context) {
+    final List<Destination> allDestinations = <Destination>[
+      Destination(title: 'Home', destination: WelcomeScreen()),
+      Destination(title: 'Puzzles', destination: PuzzleScreen()),
+      if (isBenLoggedIn) Destination(title: 'Teams', destination: TeamsPage()),
+    ];
     return Drawer(
       child: ListView(
         children:

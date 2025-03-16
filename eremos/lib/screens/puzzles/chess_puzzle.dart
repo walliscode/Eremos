@@ -1,7 +1,11 @@
+import 'package:eremos/models/app_user.dart';
+import 'package:eremos/screens/home/home.dart';
+import 'package:eremos/screens/providers/auth_provider.dart';
 import 'package:eremos/shared/base_app_bar.dart';
 import 'package:eremos/shared/navigation_drawer.dart';
 import 'package:eremos/shared/styled_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ChessPuzzle extends StatefulWidget {
   const ChessPuzzle({super.key});
@@ -15,56 +19,73 @@ class _ChessPuzzleState extends State<ChessPuzzle> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: BaseAppBar(titleText: "Puzzle 1"),
-      drawer: NavDrawer(),
-      body: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(height: 16.0),
-            // hint button
-            StyledButton(
-              onPressed: () {
-                // display floating hint text
-                _dialogBuilder(context);
-              },
-              child: const StyledButtonText('Hint'),
-            ),
-            const SizedBox(height: 16.0),
-            // chess board
-            const SizedBox(
-              width: 300, // Adjust the size to scale down the chessboard
-              height: 300,
-              child: ChessBoard(),
-            ),
-            const SizedBox(height: 16.0),
-            // text field for answer
-            SizedBox(
-              width: 200.0,
-              child: TextFormField(
-                controller: _answerController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Enter your answer',
+    return Consumer(
+      builder: (context, ref, child) {
+        final AsyncValue<AppUser?> user = ref.watch(authProvider);
+
+        return user.when(
+          data: (value) {
+            // return user to home screen if not logged in
+            if (value == null) {
+              return WelcomeScreen();
+            }
+            return Scaffold(
+              appBar: BaseAppBar(titleText: "Puzzle 1"),
+              drawer: NavDrawer(isBenLoggedIn: value.isBenLoggedIn),
+              body: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 16.0),
+                    // hint button
+                    StyledButton(
+                      onPressed: () {
+                        // display floating hint text
+                        _dialogBuilder(context);
+                      },
+                      child: const StyledButtonText('Hint'),
+                    ),
+                    const SizedBox(height: 16.0),
+                    // chess board
+                    const SizedBox(
+                      width:
+                          300, // Adjust the size to scale down the chessboard
+                      height: 300,
+                      child: ChessBoard(),
+                    ),
+                    const SizedBox(height: 16.0),
+                    // text field for answer
+                    SizedBox(
+                      width: 200.0,
+                      child: TextFormField(
+                        controller: _answerController,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Enter your answer',
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16.0),
+                    // submit button
+                    StyledButton(
+                      onPressed: () {
+                        // Handle answer submission
+                        print('Answer submitted: ${_answerController.text}');
+                      },
+                      child: const StyledButtonText('Submit'),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: 16.0),
-            // submit button
-            StyledButton(
-              onPressed: () {
-                // Handle answer submission
-                print('Answer submitted: ${_answerController.text}');
-              },
-              child: const StyledButtonText('Submit'),
-            ),
-          ],
-        ),
-      ),
+            );
+          },
+          error: (error, _) => Center(child: Text('Error loading user data.')),
+          loading: () => Center(child: CircularProgressIndicator()),
+        );
+      },
     );
   }
 }
