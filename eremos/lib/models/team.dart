@@ -1,42 +1,42 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eremos/models/app_user.dart';
-import 'package:eremos/models/puzzle_state.dart';
 
 class Team {
   String? id;
   final String name;
-  final List<PuzzleState> puzzles;
 
-  Team({required this.name})
-    : puzzles = [
-        PuzzleState(
-          puzzleName: "chessPuzzle",
-          puzzleHints: [
-            Hint(level: "easy"),
-            Hint(level: "medium"),
-            Hint(level: "hard"),
-          ],
-        ),
-      ];
+  // chessPuzzle
+  bool chessPuzzlePartOneSolved = false;
+  bool chessPuzzlePartOneEasyHintUsed = false;
+  bool chessPuzzlepartOneMediumHintUsed = false;
+  bool chessPuzzlePartOneHardHintUsed = false;
+
+  List<String?> chessPieces = List<String?>.filled(64, null);
+
+  bool chessPuzzleSolved = false;
+
+  Team({required this.name});
 
   Team.fromFirestore(Map<String, dynamic> data, this.id)
     : name = data['name'],
-      puzzles = [for (var p in data['puzzles']) PuzzleState.fromFirestore(p)];
+      chessPuzzleSolved = data['chessPuzzleSolved'],
+      chessPuzzlePartOneSolved = data['chessPuzzlePartOneSolved'],
+      chessPuzzlePartOneEasyHintUsed = data['chessPuzzlePartOneEasyHintUsed'],
+      chessPuzzlepartOneMediumHintUsed =
+          data['chessPuzzlePartOneMediumHintUsed'],
+      chessPuzzlePartOneHardHintUsed = data['chessPuzzlePartOneHardHintUsed'],
+      chessPieces = List<String?>.from(data['chessPieces']);
 
   // Method to convert a Team to a Firestore document
   Map<String, dynamic> toFirestore() {
     return {
-      'name': name,
-      'puzzles': [
-        {
-          "puzzleName": "chessPuzzle",
-          "puzzleHints": [
-            {"level": "easy", "used": false},
-            {"level": "medium", "used": false},
-            {"level": "hard", "used": false},
-          ],
-        },
-      ],
+      "name": name,
+      "chessPuzzleSolved": chessPuzzleSolved,
+      "chessPuzzlePartOneSolved": chessPuzzlePartOneSolved,
+      "chessPuzzlePartOneEasyHintUsed": chessPuzzlePartOneEasyHintUsed,
+      "chessPuzzlePartOneMediumHintUsed": chessPuzzlepartOneMediumHintUsed,
+      "chessPuzzlePartOneHardHintUsed": chessPuzzlePartOneHardHintUsed,
+      "chessPieces": chessPieces,
     };
   }
 
