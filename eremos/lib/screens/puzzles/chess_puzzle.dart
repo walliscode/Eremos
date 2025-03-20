@@ -20,9 +20,10 @@ class ChessPuzzle extends StatefulWidget {
 class _ChessPuzzleState extends State<ChessPuzzle> {
   final TextEditingController _partOneAnswerController =
       TextEditingController();
-  final TextEditingController _answerController = TextEditingController();
+  final TextEditingController _partTwoAnswerController =
+      TextEditingController();
   bool partOneSolved = false;
-  bool partTwoSolved = false;
+  bool puzzleSolved = false;
 
   late CloudbaseUser cbUser;
   late DocumentReference teamRef;
@@ -75,6 +76,7 @@ class _ChessPuzzleState extends State<ChessPuzzle> {
                 teamRef.get().then((DocumentSnapshot doc) {
                   final teamData = doc.data() as Map<String, dynamic>;
                   partOneSolved = teamData['chessPuzzlePartOneSolved'];
+                  puzzleSolved = teamData['chessPuzzleSolved'];
                 });
               });
             });
@@ -163,7 +165,7 @@ class _ChessPuzzleState extends State<ChessPuzzle> {
                       ),
                     ],
 
-                    if (partOneSolved) ...[
+                    if (partOneSolved & !puzzleSolved) ...[
                       // hint button
                       StyledButton(
                         onPressed: () {
@@ -189,7 +191,7 @@ class _ChessPuzzleState extends State<ChessPuzzle> {
                       SizedBox(
                         width: 200.0,
                         child: TextFormField(
-                          controller: _answerController,
+                          controller: _partTwoAnswerController,
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Enter your answer',
@@ -200,11 +202,34 @@ class _ChessPuzzleState extends State<ChessPuzzle> {
 
                       // submit button
                       StyledButton(
-                        onPressed: () {
-                          // Handle answer submission
+                        onPressed: () async {
+                          // part two answer submission, if correct then the chess puzzle is solved
+                          final answer = _partTwoAnswerController.text.trim();
+
+                          if (answer.toLowerCase() == 'checkmate') {
+                            // update the part to solved
+                            final DocumentReference teamRef = db
+                                .collection('teams')
+                                .doc(cbUser.teamId);
+                            teamRef.update({"chessPuzzleSolved": true});
+
+                            setState(() {
+                              puzzleSolved = true;
+                            });
+                          }
+                          // return a wrong answer message
+                          else {
+                            final hintText = "That's not the right answer";
+                            // display floating hint text
+                            _dialogBuilder(context, hintText);
+                          }
                         },
                         child: const StyledButtonText('Submit'),
                       ),
+                    ],
+                    if (puzzleSolved) ...[
+                      const SizedBox(height: 16.0),
+                      const Text('Proceed: ', style: TextStyle(fontSize: 20)),
                     ],
                   ],
                 ),
