@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eremos/models/app_user.dart';
 import 'package:eremos/screens/home/home.dart';
 import 'package:eremos/screens/providers/auth_provider.dart';
@@ -19,6 +20,10 @@ class PuzzleScreen extends StatefulWidget {
 }
 
 class _PuzzleScreenState extends State<PuzzleScreen> {
+  bool chessPuzzleSolved = false;
+  late CloudbaseUser cbUser;
+  late DocumentReference teamRef;
+
   @override
   Widget build(BuildContext context) {
     return Consumer(
@@ -31,6 +36,47 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
             if (value == null) {
               return WelcomeScreen();
             }
+
+            final db = FirebaseFirestore.instance;
+
+            // get user data from Firestore (this is the Cloud store rather than the Auth data)
+            final DocumentReference userRef = db
+                .collection('users')
+                .doc(value.uid);
+
+            userRef.get().then((DocumentSnapshot documentSnapshot) {
+              final data = documentSnapshot.data() as Map<String, dynamic>;
+
+              // if no teamId then return to main puzzles screens
+              if (data['teamId'] == null) {
+                // Navigate to the PuzzleScreen
+                return WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => WelcomeScreen()),
+                  );
+                });
+              }
+
+              setState(() {
+                // set the user data
+                cbUser = CloudbaseUser(
+                  uid: documentSnapshot.id,
+                  displayName: data['displayName'],
+                  teamId: data['teamId'],
+                );
+
+                // set the team data
+                teamRef = db.collection('teams').doc(cbUser.teamId);
+
+                // set the part one solved status
+                teamRef.get().then((DocumentSnapshot doc) {
+                  final teamData = doc.data() as Map<String, dynamic>;
+
+                  chessPuzzleSolved = teamData['chessPuzzleSolved'];
+                });
+              });
+            });
+
             return Scaffold(
               appBar: BaseAppBar(titleText: "puzzles"),
               drawer: NavDrawer(isBenLoggedIn: value.isBenLoggedIn),
@@ -58,9 +104,8 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                     const SizedBox(height: 16.0),
                     // puzzle 2
                     StyledButton(
-                      onPressed: () {
-                        // navigate to puzzle 2 screen
-                      },
+                      isEnabled: chessPuzzleSolved,
+                      onPressed: () {},
                       child: const StyledButtonText('Puzzle 2'),
                     ),
                     const SizedBox(height: 16.0),

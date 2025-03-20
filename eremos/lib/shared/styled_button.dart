@@ -2,22 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class StyledButton extends StatelessWidget {
-  const StyledButton({super.key, required this.onPressed, required this.child});
+  const StyledButton({
+    super.key,
+    required this.onPressed,
+    required this.child,
+    this.isEnabled = true,
+  });
 
-  final void Function() onPressed;
+  final void Function()? onPressed;
+  final bool isEnabled;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
     return TextButton(
       style: TextButton.styleFrom(
-        backgroundColor: Colors.blue[500],
+        // change the background color of the button depending on the value of isEnabled
+        backgroundColor: isEnabled ? Colors.blue : Colors.grey,
         foregroundColor: Colors.white,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(5)),
         ),
       ),
-      onPressed: onPressed,
+      onPressed: isEnabled ? onPressed : null,
       child: child,
     );
   }
