@@ -14,10 +14,10 @@ class ChessPuzzle extends StatefulWidget {
   const ChessPuzzle({super.key});
 
   @override
-  _ChessPuzzleState createState() => _ChessPuzzleState();
+  ChessPuzzleState createState() => ChessPuzzleState();
 }
 
-class _ChessPuzzleState extends State<ChessPuzzle> {
+class ChessPuzzleState extends State<ChessPuzzle> {
   final TextEditingController _partOneAnswerController =
       TextEditingController();
   final TextEditingController _partTwoAnswerController =

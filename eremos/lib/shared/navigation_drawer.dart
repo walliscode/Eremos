@@ -1,6 +1,7 @@
 // implemenet a navigation drawer than can be used in all screens
 //
 
+import 'package:eremos/screens/drinks/manage_drinks.dart';
 import 'package:eremos/screens/home/home.dart';
 import 'package:eremos/screens/puzzles/puzzles.dart';
 import 'package:eremos/screens/teams/team_page.dart';
@@ -24,6 +25,7 @@ class NavDrawer extends StatelessWidget {
     final List<Destination> allDestinations = <Destination>[
       Destination(title: 'Home', destination: WelcomeScreen()),
       Destination(title: 'Puzzles', destination: PuzzleScreen()),
+      Destination(title: 'Drinks', destination: ManageDrinks()),
       if (isBenLoggedIn) Destination(title: 'Teams', destination: TeamsPage()),
     ];
     return Drawer(
