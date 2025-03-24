@@ -5,6 +5,9 @@ class Team {
   String? id;
   final String name;
 
+  // drink tokens
+  int toBeDrunk = 0;
+  int toGive = 0;
   // chessPuzzle
   bool chessPuzzlePartOneSolved = false;
   bool chessPuzzlePartOneEasyHintUsed = false;
@@ -19,6 +22,8 @@ class Team {
 
   Team.fromFirestore(Map<String, dynamic> data, this.id)
     : name = data['name'],
+      toBeDrunk = data['toBeDrunk'],
+      toGive = data['toGive'],
       chessPuzzleSolved = data['chessPuzzleSolved'],
       chessPuzzlePartOneSolved = data['chessPuzzlePartOneSolved'],
       chessPuzzlePartOneEasyHintUsed = data['chessPuzzlePartOneEasyHintUsed'],
@@ -31,6 +36,8 @@ class Team {
   Map<String, dynamic> toFirestore() {
     return {
       "name": name,
+      "toBeDrunk": toBeDrunk,
+      "toGive": toGive,
       "chessPuzzleSolved": chessPuzzleSolved,
       "chessPuzzlePartOneSolved": chessPuzzlePartOneSolved,
       "chessPuzzlePartOneEasyHintUsed": chessPuzzlePartOneEasyHintUsed,
