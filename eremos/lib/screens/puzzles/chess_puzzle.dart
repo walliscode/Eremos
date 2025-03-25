@@ -170,7 +170,17 @@ class ChessPuzzleState extends State<ChessPuzzle> {
                       StyledButton(
                         onPressed: () {
                           final hintText =
-                              "The wise see many moves ahead, yet even the greatest must bow when their final hour arrives. Speak to me the killing blow";
+                              "On an ancient sheet where seekers roam,\n"
+                              "Two letters mark this mapped-out home.\n"
+                              "Forty-nine where daylight breaks,\n"
+                              "Ninety north where the stillness wakes.\n"
+                              "A battlefield set for queens and kings,\n"
+                              "Where strategy flows and memory clings.\n"
+                              "Eight by eight, black and white,\n"
+                              "Set the stage for a checkmate sight.\n"
+                              "What must you do? Seek and see—\n"
+                              "A game of minds, where moves run free.";
+
                           // display floating hint text
                           _dialogBuilder(context, hintText);
                         },
@@ -206,7 +216,7 @@ class ChessPuzzleState extends State<ChessPuzzle> {
                           // part two answer submission, if correct then the chess puzzle is solved
                           final answer = _partTwoAnswerController.text.trim();
 
-                          if (answer.toLowerCase() == 'checkmate') {
+                          if (answer == 'Qxh7#') {
                             // update the part to solved
                             final DocumentReference teamRef = db
                                 .collection('teams')
@@ -229,7 +239,10 @@ class ChessPuzzleState extends State<ChessPuzzle> {
                     ],
                     if (puzzleSolved) ...[
                       const SizedBox(height: 16.0),
-                      const Text('Proceed: ', style: TextStyle(fontSize: 20)),
+                      const Text(
+                        'Proceed: SS 4913 9051 ',
+                        style: TextStyle(fontSize: 20),
+                      ),
                     ],
                   ],
                 ),
@@ -395,14 +408,14 @@ class _ChessBoardState extends State<ChessBoard> {
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    color: isWhite ? Colors.white : Colors.black,
+                    color: isWhite ? Colors.white : Colors.purple,
                     border: Border.all(color: Colors.grey),
                   ),
                   child: Center(
                     child: Text(
                       piece ?? '',
                       style: TextStyle(
-                        color: isWhite ? Colors.black : Colors.white,
+                        //color: isWhite ? Colors.black : Colors.white,
                         fontSize: 24,
                       ),
                     ),
