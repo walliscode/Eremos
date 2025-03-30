@@ -3,6 +3,7 @@ import 'package:eremos/models/app_user.dart';
 import 'package:eremos/screens/home/home.dart';
 import 'package:eremos/screens/providers/auth_provider.dart';
 import 'package:eremos/screens/puzzles/chess_puzzle.dart';
+import 'package:eremos/screens/puzzles/round_table_puzzle.dart';
 import 'package:eremos/shared/base_app_bar.dart';
 import 'package:eremos/shared/navigation_drawer.dart';
 import 'package:eremos/shared/styled_button.dart';
@@ -105,7 +106,14 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                     // puzzle 2
                     StyledButton(
                       isEnabled: chessPuzzleSolved,
-                      onPressed: () {},
+                      onPressed: () {
+                        // navgiate to round table puzzle screen
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const RoundTablePuzzle(),
+                          ),
+                        );
+                      },
                       child: const StyledButtonText('Puzzle 2'),
                     ),
                     const SizedBox(height: 16.0),
