@@ -13,10 +13,23 @@ class Team {
   bool chessPuzzlePartOneEasyHintUsed = false;
   bool chessPuzzlepartOneMediumHintUsed = false;
   bool chessPuzzlePartOneHardHintUsed = false;
-
   List<String?> chessPieces = List<String?>.filled(64, null);
-
   bool chessPuzzleSolved = false;
+
+  // round table puzzle
+  bool roundTablePuzzleSolved = false;
+  bool seatOneUnlocked = false;
+  bool seatOneSolved = false;
+  bool seatTwoUnlocked = false;
+  bool seatTwoSolved = false;
+  bool seatThreeUnlocked = false;
+  bool seatThreeSolved = false;
+  bool seatFourUnlocked = false;
+  bool seatFourSolved = false;
+  bool seatFiveUnlocked = false;
+  bool seatFiveSolved = false;
+  bool seatSixUnlocked = false;
+  bool seatSixSolved = false;
 
   Team({required this.name});
 
@@ -30,7 +43,21 @@ class Team {
       chessPuzzlepartOneMediumHintUsed =
           data['chessPuzzlePartOneMediumHintUsed'],
       chessPuzzlePartOneHardHintUsed = data['chessPuzzlePartOneHardHintUsed'],
-      chessPieces = List<String?>.from(data['chessPieces']);
+      chessPieces = List<String?>.from(data['chessPieces']),
+
+      roundTablePuzzleSolved = data['roundTablePuzzleSolved'],
+      seatOneUnlocked = data['seatOneUnlocked'],
+      seatOneSolved = data['seatOneSolved'],
+      seatTwoUnlocked = data['seatTwoUnlocked'],
+      seatTwoSolved = data['seatTwoSolved'],
+      seatThreeUnlocked = data['seatThreeUnlocked'],
+      seatThreeSolved = data['seatThreeSolved'],
+      seatFourUnlocked = data['seatFourUnlocked'],
+      seatFourSolved = data['seatFourSolved'],
+      seatFiveUnlocked = data['seatFiveUnlocked'],
+      seatFiveSolved = data['seatFiveSolved'],
+      seatSixUnlocked = data['seatSixUnlocked'],
+      seatSixSolved = data['seatSixSolved'];
 
   // Method to convert a Team to a Firestore document
   Map<String, dynamic> toFirestore() {
@@ -44,6 +71,19 @@ class Team {
       "chessPuzzlePartOneMediumHintUsed": chessPuzzlepartOneMediumHintUsed,
       "chessPuzzlePartOneHardHintUsed": chessPuzzlePartOneHardHintUsed,
       "chessPieces": chessPieces,
+      "roundTablePuzzleSolved": roundTablePuzzleSolved,
+      "seatOneUnlocked": seatOneUnlocked,
+      "seatOneSolved": seatOneSolved,
+      "seatTwoUnlocked": seatTwoUnlocked,
+      "seatTwoSolved": seatTwoSolved,
+      "seatThreeUnlocked": seatThreeUnlocked,
+      "seatThreeSolved": seatThreeSolved,
+      "seatFourUnlocked": seatFourUnlocked,
+      "seatFourSolved": seatFourSolved,
+      "seatFiveUnlocked": seatFiveUnlocked,
+      "seatFiveSolved": seatFiveSolved,
+      "seatSixUnlocked": seatSixUnlocked,
+      "seatSixSolved": seatSixSolved,
     };
   }
 
