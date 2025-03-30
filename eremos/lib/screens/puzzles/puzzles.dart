@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eremos/models/app_user.dart';
 import 'package:eremos/screens/home/home.dart';
 import 'package:eremos/screens/providers/auth_provider.dart';
+import 'package:eremos/screens/puzzles/buried_treasure_puzzle.dart';
 import 'package:eremos/screens/puzzles/chess_puzzle.dart';
 import 'package:eremos/screens/puzzles/round_table_puzzle.dart';
 import 'package:eremos/shared/base_app_bar.dart';
@@ -22,6 +23,7 @@ class PuzzleScreen extends StatefulWidget {
 
 class _PuzzleScreenState extends State<PuzzleScreen> {
   bool chessPuzzleSolved = false;
+  bool roundTablePuzzleSolved = false;
   late CloudbaseUser cbUser;
   late DocumentReference teamRef;
 
@@ -74,6 +76,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                   final teamData = doc.data() as Map<String, dynamic>;
 
                   chessPuzzleSolved = teamData['chessPuzzleSolved'];
+                  roundTablePuzzleSolved = teamData['roundTablePuzzleSolved'];
                 });
               });
             });
@@ -119,8 +122,14 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                     const SizedBox(height: 16.0),
                     // puzzle 3
                     StyledButton(
+                      isEnabled: roundTablePuzzleSolved,
                       onPressed: () {
                         // navigate to puzzle 3 screen
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => BuriedTreasurePuzzle(),
+                          ),
+                        );
                       },
                       child: const StyledButtonText('Puzzle 3'),
                     ),

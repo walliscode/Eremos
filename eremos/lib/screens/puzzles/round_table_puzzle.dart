@@ -620,8 +620,6 @@ class RoundTablePuzzleState extends State<RoundTablePuzzle> {
                 ),
               ),
             );
-            ;
-            ;
           },
           error: (error, _) => Center(child: Text('Error loading user data.')),
           loading: () => Center(child: CircularProgressIndicator()),
