@@ -101,6 +101,9 @@ class ChessPuzzleState extends State<ChessPuzzle> {
                       const SizedBox(height: 16.0),
                       StyledButton(
                         onPressed: () {
+                          teamRef.update({
+                            "chessPuzzlePartOneHardHintUsed": true,
+                          });
                           final hintText = "1<<6";
                           // display floating hint text
                           _dialogBuilder(context, hintText);
@@ -110,7 +113,11 @@ class ChessPuzzleState extends State<ChessPuzzle> {
                       const SizedBox(height: 15.0),
                       StyledButton(
                         onPressed: () {
-                          final hintText = "The game of kings";
+                          teamRef.update({
+                            "chessPuzzlePartOneMediumHintUsed": true,
+                          });
+                          final hintText =
+                              "The Greatest Fischerman of all time";
                           // display floating hint text
                           _dialogBuilder(context, hintText);
                         },
@@ -119,6 +126,9 @@ class ChessPuzzleState extends State<ChessPuzzle> {
                       const SizedBox(height: 15.0),
                       StyledButton(
                         onPressed: () {
+                          teamRef.update({
+                            "chessPuzzlePartOneEasyHintUsed": true,
+                          });
                           final hintText =
                               "it's chess.....you're playing chess";
                           // display floating hint text
@@ -221,6 +231,34 @@ class ChessPuzzleState extends State<ChessPuzzle> {
                             final DocumentReference teamRef = db
                                 .collection('teams')
                                 .doc(cbUser.teamId);
+                            // update drinks tokens ("toGive") depending on hints used
+                            int drinksTokens = 3;
+
+                            teamRef.get().then((DocumentSnapshot doc) {
+                              final teamData =
+                                  doc.data() as Map<String, dynamic>;
+                              if (teamData['chessPuzzlePartOneHardHintUsed'] ==
+                                  true) {
+                                drinksTokens = 3;
+                              } else if (teamData['chessPuzzlePartOneMediumHintUsed'] ==
+                                  true) {
+                                drinksTokens = 2;
+                              } else if (teamData['chessPuzzlePartOneEasyHintUsed'] ==
+                                  true) {
+                                drinksTokens = 1;
+                              }
+                            });
+                            // update the drinks tokens if chessPuzzelSolved is false, this is to prevent repeat pressing
+                            teamRef.get().then((DocumentSnapshot doc) {
+                              final teamData =
+                                  doc.data() as Map<String, dynamic>;
+
+                              if (teamData['chessPuzzleSolved'] == false) {
+                                teamRef.update({
+                                  "toGive": FieldValue.increment(drinksTokens),
+                                });
+                              }
+                            });
                             teamRef.update({"chessPuzzleSolved": true});
 
                             setState(() {
